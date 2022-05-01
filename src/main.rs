@@ -1,8 +1,7 @@
 use clap::{arg, Command};
 
 fn cli() -> Command<'static> {
-    Command::new("git")
-        .about("A fictional versioning CLI")
+    Command::new("cf")
         .subcommand_required(true)
         .arg_required_else_help(true)
         .subcommand(
