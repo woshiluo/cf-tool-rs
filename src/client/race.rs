@@ -28,25 +28,11 @@ impl WebClient {
         }
 
         for problem in problems {
-            let (inputs, outputs) = self.parse(contest_id, &problem)?;
-
-            let base = format!("./{}/{}/", contest_id, problem);
-            std::fs::create_dir_all(&base).unwrap();
-
-            let size = inputs.len();
-            for i in 1..=size {
-                use std::io::Write;
-                {
-                    let mut file =
-                        std::fs::File::create(format!("{}{}{}.in", base, &problem, i)).unwrap();
-                    file.write_all(inputs[i - 1].as_ref()).unwrap();
-                }
-                {
-                    let mut file =
-                        std::fs::File::create(format!("{}{}{}.ans", base, &problem, i)).unwrap();
-                    file.write_all(outputs[i - 1].as_ref()).unwrap();
-                }
-            }
+            crate::util::write_sample(
+                self.parse(contest_id, &problem)?,
+                &problem,
+                format!("./{}/{}/", contest_id, problem),
+            );
         }
 
         Ok(())

@@ -37,20 +37,7 @@ fn main() {
                 .unwrap()
                 .to_ascii_lowercase();
             println!("Parsing {} {}", cid, pid);
-            let (inputs, outputs) = client.parse(cid, &pid).unwrap();
-
-            let size = inputs.len();
-            for i in 1..=size {
-                use std::io::Write;
-                {
-                    let mut file = std::fs::File::create(format!("{}{}.in", pid, i)).unwrap();
-                    file.write_all(inputs[i - 1].as_ref()).unwrap();
-                }
-                {
-                    let mut file = std::fs::File::create(format!("{}{}.ans", pid, i)).unwrap();
-                    file.write_all(outputs[i - 1].as_ref()).unwrap();
-                }
-            }
+            cf_tool::util::write_sample(client.parse(cid, &pid).unwrap(), &pid, format!("./"));
         }
         Some(("race", sub_matches)) => {
             let cid = sub_matches
