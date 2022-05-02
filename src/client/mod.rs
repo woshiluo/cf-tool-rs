@@ -8,16 +8,34 @@ use std::sync::Arc;
 
 pub struct WebClient {
     client: reqwest::blocking::Client,
-    cookies: Arc<reqwest::cookie::Jar>,
+    config: crate::config::Config,
+    cookies: Arc<reqwest_cookie_store::CookieStoreMutex>,
     has_rcpc: bool,
     logined: bool,
+}
+
+impl Drop for WebClient {
+    fn drop(&mut self) {
+        let mut file = std::fs::File::create(&self.config.session_file)
+            .map(std::io::BufWriter::new)
+            .unwrap();
+        let cookies = self.cookies.lock().unwrap();
+        cookies.save_json(&mut file).unwrap();
+    }
 }
 
 const PARMA_BFAA: &'static str = "f1b3f18c715565b589b7823cda7448ce";
 
 impl WebClient {
-    pub fn new() -> WebClient {
-        let jar = Arc::from(reqwest::cookie::Jar::default());
+    pub fn new(config: crate::config::Config) -> WebClient {
+        let cookie_store = {
+            let file = std::fs::File::open(&config.session_file).map(std::io::BufReader::new);
+            match file {
+                Ok(file) => cookie_store::CookieStore::load_json(file).unwrap(),
+                _ => cookie_store::CookieStore::default(),
+            }
+        };
+        let jar = Arc::from(reqwest_cookie_store::CookieStoreMutex::new(cookie_store));
         let client = reqwest::blocking::Client::builder()
             .cookie_store(true)
             .cookie_provider(Arc::clone(&jar))
@@ -25,6 +43,7 @@ impl WebClient {
             .unwrap();
         WebClient {
             client,
+            config,
             cookies: jar,
             has_rcpc: false,
             logined: false,
@@ -52,10 +71,15 @@ impl WebClient {
             .decrypt_padded_mut::<ZeroPadding>(&mut text)
             .unwrap();
 
-        self.cookies.add_cookie_str(
-            &format!("RCPC={}", hex::encode(pt)),
-            &"https://codeforces.com".parse::<reqwest::Url>().unwrap(),
-        );
+        {
+            let mut cookies = self.cookies.lock().unwrap();
+            cookies
+                .parse(
+                    &format!("RCPC={}", hex::encode(pt)),
+                    &"https://codeforces.com".parse::<reqwest::Url>().unwrap(),
+                )
+                .unwrap();
+        }
 
         self.has_rcpc = true;
 

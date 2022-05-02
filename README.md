@@ -14,7 +14,7 @@ WIP. Pull Requests / Contributions are welcomed!
   - [ ] Countdown
 - [ ] submit
 - [x] config file
-- [ ] session file
+- [x] session file
 
 ## Interested 
 

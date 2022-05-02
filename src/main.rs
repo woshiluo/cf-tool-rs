@@ -21,12 +21,10 @@ fn cli() -> Command<'static> {
 
 fn main() {
     let matches = cli().get_matches();
-    let mut client = cf_tool::client::WebClient::new();
     let config = cf_tool::config::Config::from_file(
         dirs::config_dir().unwrap().join("cf-tool-rs/config.toml"),
     );
-
-    println!("{:?}", config);
+    let mut client = cf_tool::client::WebClient::new(config);
 
     match matches.subcommand() {
         Some(("parse", sub_matches)) => {
@@ -41,7 +39,7 @@ fn main() {
                 .parse::<String>()
                 .unwrap()
                 .to_ascii_lowercase();
-            println!("Parsing {} {}", cid, pid);
+            client.login().unwrap();
             cf_tool::util::write_sample(client.parse(cid, &pid).unwrap(), &pid, format!("./"));
         }
         Some(("race", sub_matches)) => {
@@ -51,7 +49,7 @@ fn main() {
                 .parse::<u32>()
                 .unwrap();
 
-            client.login(&config.handle).unwrap();
+            client.login().unwrap();
             client.race(cid).unwrap();
         }
         _ => unreachable!(), // If all subcommands are defined above, anything else is unreachabe!()
