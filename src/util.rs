@@ -1,6 +1,7 @@
 use crate::CFToolError;
 
-pub fn get_url(client: &reqwest::blocking::Client, url: &str) -> Result<String, CFToolError> {
+pub fn get_url(url: &str) -> Result<String, CFToolError> {
+    let client = reqwest::blocking::Client::builder().build().unwrap();
     let builder = client.get(url);
     let respone = builder.send().map_err(|_| CFToolError::FailedRequest)?;
     if respone.status().is_success() {

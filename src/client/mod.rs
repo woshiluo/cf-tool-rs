@@ -54,9 +54,16 @@ impl WebClient {
         if self.has_rcpc {
             return Ok(());
         };
+
+        self.has_rcpc = true;
+
         use aes::cipher::{block_padding::ZeroPadding, BlockDecryptMut, KeyIvInit};
 
-        let body = crate::util::get_url(&self.client, "https://codeforces.com")?;
+        let body = crate::util::get_url("https://codeforces.com")?;
+
+        if let None = body.find("Redirecting") {
+            return Ok(());
+        }
 
         let number_regex = Regex::new(r#"toNumbers\("(.+?)"\)"#).unwrap();
         let caps = number_regex.captures_iter(&body);
@@ -81,8 +88,6 @@ impl WebClient {
                 .unwrap();
         }
 
-        self.has_rcpc = true;
-
         Ok(())
     }
 
@@ -94,6 +99,8 @@ impl WebClient {
         Ok(caps[1].to_string())
     }
 
+    // TODO: Return status code?
+    // TODO: Block redir?
     pub fn get_url(&mut self, url: &str) -> Result<String, CFToolError> {
         self.set_rcpc()?;
 
@@ -128,7 +135,7 @@ impl WebClient {
         if respone.status().is_success() {
             Ok(respone.text().map_err(|_| CFToolError::FailedRequest)?)
         } else {
-            Err(crate::CFToolError::FailedRequest)
+            Err(crate::CFToolError::WrongRespone(respone.status().as_u16()))
         }
     }
 }

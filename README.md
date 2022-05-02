@@ -8,10 +8,10 @@ WIP. Pull Requests / Contributions are welcomed!
 
 - [x] login
 - [x] parse
-- [ ] race
+- [x] race
   - [x] public contest
   - [x] login
-  - [ ] Countdown
+  - [x] Countdown
 - [ ] submit
 - [x] config file
 - [x] session file

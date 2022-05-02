@@ -8,6 +8,9 @@ impl WebClient {
         problem_id: &str,
     ) -> Result<(Vec<String>, Vec<String>), CFToolError> {
         let problem_id = problem_id.to_lowercase();
+        if !self.logined {
+            return Err(CFToolError::NotLogin);
+        }
         println!("Parsing {} {}", contest_id, &problem_id);
         let body = self.get_url(&format!(
             "https://codeforces.com/contest/{}/problem/{}",

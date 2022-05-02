@@ -8,7 +8,7 @@ pub mod util;
 pub enum CFToolError {
     FailedRequest,
     FailedParseRespone,
-    WrongRespone(u32),
+    WrongRespone(u16),
     NotLogin,
 }
 
