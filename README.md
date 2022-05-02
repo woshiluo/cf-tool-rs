@@ -9,6 +9,9 @@ WIP. Pull Requests / Contributions are welcomed!
 - [x] login
 - [x] parse
 - [ ] race
+  - [x] public contest
+  - [ ] login
+  - [ ] Countdown
 - [ ] submit
 - [ ] config file
 - [ ] session file

@@ -6,6 +6,9 @@ pub mod util;
 #[derive(Debug, Clone)]
 pub enum CFToolError {
     FailedRequest,
+    FailedParseRespone,
+    WrongRespone(u32),
+    NotLogin,
 }
 
 impl fmt::Display for CFToolError {

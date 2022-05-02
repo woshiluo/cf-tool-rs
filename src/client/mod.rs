@@ -1,5 +1,6 @@
 pub mod login;
 pub mod parse;
+pub mod race;
 
 use crate::CFToolError;
 use regex::Regex;
@@ -9,6 +10,7 @@ pub struct WebClient {
     client: reqwest::blocking::Client,
     cookies: Arc<reqwest::cookie::Jar>,
     has_rcpc: bool,
+    logined: bool,
 }
 
 const PARMA_BFAA: &'static str = "f1b3f18c715565b589b7823cda7448ce";
@@ -25,6 +27,7 @@ impl WebClient {
             client,
             cookies: jar,
             has_rcpc: false,
+            logined: false,
         }
     }
 

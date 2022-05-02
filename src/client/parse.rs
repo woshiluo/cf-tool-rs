@@ -1,9 +1,3 @@
-//
-// parse.rs
-// Copyright (C) 2022 Woshiluo Luo <woshiluo.luo@outlook.com>
-// Distributed under terms of the GNU AGPLv3+ license.
-//
-
 use crate::client::WebClient;
 use crate::CFToolError;
 
@@ -11,8 +5,10 @@ impl WebClient {
     pub fn parse(
         &mut self,
         contest_id: u32,
-        problem_id: char,
+        problem_id: &str,
     ) -> Result<(Vec<String>, Vec<String>), CFToolError> {
+        let problem_id = problem_id.to_lowercase();
+        println!("Parsing {} {}", contest_id, &problem_id);
         let body = self.get_url(&format!(
             "https://codeforces.com/contest/{}/problem/{}",
             contest_id, problem_id,

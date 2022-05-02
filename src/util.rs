@@ -1,9 +1,3 @@
-//
-// util.rs
-// Copyright (C) 2022 Woshiluo Luo <woshiluo.luo@outlook.com>
-// Distributed under terms of the GNU AGPLv3+ license.
-//
-
 use crate::CFToolError;
 
 pub fn get_url(client: &reqwest::blocking::Client, url: &str) -> Result<String, CFToolError> {
