@@ -15,7 +15,7 @@ impl WebClient {
                 Some(
                     caps[1].parse::<u64>().unwrap() * 60 * 60
                         + caps[2].parse::<u64>().unwrap() * 60
-                        + caps[3].parse::<u64>().unwrap() * 60,
+                        + caps[3].parse::<u64>().unwrap(),
                 )
             }
             _ => None,
