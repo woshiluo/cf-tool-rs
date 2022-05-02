@@ -6,15 +6,19 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+clap = { version = "3.1.14", features = ["derive"] }
+
 reqwest = { version="0.11.10", features = [ "blocking", "cookies" ] }
-regex = "1.5.5"
 
 aes = "0.8.1"
 cbc = "0.1.2"
 hex = "0.4.3"
-
 rand = "0.8.5"
 
+regex = "1.5.5"
 scraper = "0.13.0"
 
-clap = { version = "3.1.14", features = ["derive"] }
+serde = "1.0"
+toml = "0.5.9"
+dirs = "4.0.0"
+rpassword = "6.0.1"

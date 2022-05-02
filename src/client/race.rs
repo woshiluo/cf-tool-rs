@@ -4,9 +4,9 @@ use crate::CFToolError;
 impl WebClient {
     pub fn race(&mut self, contest_id: u32) -> Result<(), CFToolError> {
         // TODO: CountDown
-        // if !self.logined {
-        //     return Err(CFToolError::NotLogin);
-        // }
+        if !self.logined {
+            return Err(CFToolError::NotLogin);
+        }
 
         let body = self.get_url(&format!("https://codeforces.com/contest/{}", contest_id))?;
         let mut problems: Vec<String> = vec![];

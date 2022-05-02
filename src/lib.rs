@@ -1,6 +1,7 @@
 use std::fmt;
 
 pub mod client;
+pub mod config;
 pub mod util;
 
 #[derive(Debug, Clone)]

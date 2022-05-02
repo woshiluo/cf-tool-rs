@@ -2,7 +2,8 @@ use crate::client::WebClient;
 use crate::CFToolError;
 
 impl WebClient {
-    pub fn login(&mut self, handle: &str, password: &str) -> Result<(), CFToolError> {
+    pub fn login(&mut self, handle: &str) -> Result<(), CFToolError> {
+        let password = rpassword::prompt_password("Your password: ").unwrap();
         let _ = self.post_url(
             "https://codeforces.com/enter",
             "https://codeforces.com/enter",
