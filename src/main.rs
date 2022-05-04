@@ -17,6 +17,7 @@ fn cli() -> Command<'static> {
                 .arg(arg!(<CID> "contest id"))
                 .arg_required_else_help(true),
         )
+        .subcommand(Command::new("submit").about("Submit Code"))
 }
 
 fn main() {
@@ -40,7 +41,7 @@ fn main() {
                 .unwrap()
                 .to_ascii_lowercase();
             client.login().unwrap();
-            cf_tool::util::write_sample(client.parse(cid, &pid).unwrap(), &pid, format!("./"));
+            cf_tool::util::write_sample(client.parse(cid, &pid).unwrap(), &pid, "./");
         }
         Some(("race", sub_matches)) => {
             let cid = sub_matches
@@ -51,6 +52,19 @@ fn main() {
 
             client.login().unwrap();
             client.race(cid).unwrap();
+        }
+        Some(("submit", _)) => {
+            let current_path = std::env::current_dir()
+                .unwrap()
+                .to_string_lossy()
+                .into_owned();
+            let mut dirs: Vec<&str> = current_path.rsplit('/').collect();
+            dirs.reverse();
+            let pid = dirs.pop().unwrap();
+            let cid = dirs.pop().unwrap().parse::<u32>().unwrap();
+
+            client.login().unwrap();
+            client.submit(cid, pid).unwrap();
         }
         _ => unreachable!(), // If all subcommands are defined above, anything else is unreachabe!()
     }

@@ -30,8 +30,8 @@ impl WebClient {
             "https://codeforces.com/enter",
             "https://codeforces.com/enter",
             vec![
-                ("handleOrEmail", handle.into()),
-                ("password", password.into()),
+                ("handleOrEmail", handle),
+                ("password", password),
                 ("action", "enter".into()),
                 ("_tta", "176".into()),
                 ("remember", "on".into()),

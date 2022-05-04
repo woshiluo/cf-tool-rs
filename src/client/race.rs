@@ -1,8 +1,18 @@
+use std::io::{stdout, Write};
+use std::thread::sleep;
+use std::time::Duration;
+
+use crossterm::{
+    cursor, execute,
+    terminal::{Clear, ClearType},
+};
+use scraper::{Html, Selector};
+
 use crate::client::WebClient;
 use crate::CFToolError;
 
 impl WebClient {
-    pub fn is_started(&mut self, contest_id: u32) -> Result<Option<u64>, CFToolError> {
+    fn contest_started(&mut self, contest_id: u32) -> Result<Option<u64>, CFToolError> {
         let body = self.get_url(&format!(
             "https://codeforces.com/contest/{}/countdown",
             contest_id
@@ -21,35 +31,40 @@ impl WebClient {
             _ => None,
         })
     }
+
     pub fn race(&mut self, contest_id: u32) -> Result<(), CFToolError> {
         if !self.logined {
             return Err(CFToolError::NotLogin);
         }
-        println!("Race {}", contest_id);
-        if let Some(mut time) = self.is_started(contest_id)? {
-            loop {
-                let mut stdout = std::io::stdout();
-                while time > 0 {
-                    use crossterm::{cursor, ExecutableCommand};
-                    use std::io::Write;
 
-                    stdout
-                        .execute(crossterm::terminal::Clear(
-                            crossterm::terminal::ClearType::CurrentLine,
-                        ))
-                        .unwrap();
-                    stdout.execute(cursor::MoveToColumn(1)).unwrap();
+        println!("Race {}", contest_id);
+        if let Some(mut time) = self.contest_started(contest_id)? {
+            loop {
+                let mut stdout = stdout();
+                let wait_time =
+                    std::time::Instant::now() + Duration::from_secs(std::cmp::min(time, 900));
+
+                while std::time::Instant::now() < wait_time {
+                    execute!(
+                        stdout,
+                        Clear(ClearType::CurrentLine),
+                        cursor::MoveToColumn(1)
+                    )
+                    .map_err(|_| CFToolError::FailedTerminalOutput)?;
 
                     let seconds = time % 60;
                     let minutes = time / 60 % 60;
                     let hours = time / 60 / 60;
+
                     print!("{:0>2}:{:0>2}:{:0>2}", hours, minutes, seconds);
-                    stdout.flush().unwrap();
-                    std::thread::sleep(std::time::Duration::from_secs(1));
-                    time -= 1;
+                    stdout
+                        .flush()
+                        .map_err(|_| CFToolError::FailedTerminalOutput)?;
+
+                    sleep(Duration::from_secs(1));
                 }
-                std::thread::sleep(std::time::Duration::from_secs(time));
-                match self.is_started(contest_id)? {
+
+                match self.contest_started(contest_id)? {
                     Some(new_time) => time = new_time,
                     _ => break,
                 }
@@ -59,7 +74,6 @@ impl WebClient {
         let body = self.get_url(&format!("https://codeforces.com/contest/{}", contest_id))?;
         let mut problems: Vec<String> = vec![];
 
-        use scraper::{Html, Selector};
         let fragment = Html::parse_fragment(&body);
         let tr_selector = Selector::parse(".problems > tbody > tr").unwrap();
 
@@ -71,7 +85,7 @@ impl WebClient {
             }
         }
 
-        if problems.len() == 0 {
+        if problems.is_empty() {
             return Err(CFToolError::FailedParseRespone);
         }
 

@@ -12,16 +12,17 @@ WIP. Pull Requests / Contributions are welcomed!
   - [x] public contest
   - [x] login
   - [x] Countdown
-- [ ] submit
+- [x] submit
 - [x] config file
 - [x] session file
+- [ ] Colorful output
 
 ## Interested 
 
+- [ ] watch
 - [ ] test
 - [ ] list
 
 ## Not Interested
 
 - Template
-- Watch
