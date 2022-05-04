@@ -1,12 +1,19 @@
 use crate::client::WebClient;
 use crate::CFToolError;
 
+use crossterm::{
+    execute,
+    style::{Color, ResetColor, SetForegroundColor},
+};
+
 impl WebClient {
     pub fn parse(
         &mut self,
         contest_id: u32,
         problem_id: &str,
     ) -> Result<(Vec<String>, Vec<String>), CFToolError> {
+        let mut stdout = std::io::stdout();
+
         let problem_id = problem_id.to_lowercase();
         if !self.logined {
             return Err(CFToolError::NotLogin);
@@ -34,6 +41,15 @@ impl WebClient {
         for output in outputs {
             output_cases.push(output.inner_html().to_string());
         }
+
+        execute!(stdout, SetForegroundColor(Color::Green))?;
+        println!(
+            "Parsed {} {} with {} samples",
+            contest_id,
+            problem_id,
+            input_cases.len()
+        );
+        execute!(stdout, ResetColor)?;
 
         Ok((input_cases, output_cases))
     }

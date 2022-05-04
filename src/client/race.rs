@@ -4,6 +4,7 @@ use std::time::Duration;
 
 use crossterm::{
     cursor, execute,
+    style::{Color, ResetColor, SetForegroundColor},
     terminal::{Clear, ClearType},
 };
 use scraper::{Html, Selector};
@@ -37,21 +38,26 @@ impl WebClient {
             return Err(CFToolError::NotLogin);
         }
 
+        let mut stdout = stdout();
         println!("Race {}", contest_id);
         if let Some(mut time) = self.contest_started(contest_id)? {
             loop {
-                let mut stdout = stdout();
+                execute!(stdout, SetForegroundColor(Color::Green))?;
+                println!("Countdown:");
+                execute!(stdout, ResetColor)?;
+
                 let wait_time =
                     std::time::Instant::now() + Duration::from_secs(std::cmp::min(time, 900));
+                let started_time = std::time::Instant::now() + Duration::from_secs(time);
 
                 while std::time::Instant::now() < wait_time {
                     execute!(
                         stdout,
                         Clear(ClearType::CurrentLine),
-                        cursor::MoveToColumn(1)
-                    )
-                    .map_err(|_| CFToolError::FailedTerminalOutput)?;
+                        cursor::MoveToColumn(1),
+                    )?;
 
+                    let time = (started_time - std::time::Instant::now()).as_secs();
                     let seconds = time % 60;
                     let minutes = time / 60 % 60;
                     let hours = time / 60 / 60;
@@ -70,6 +76,10 @@ impl WebClient {
                 }
             }
         };
+
+        execute!(stdout, SetForegroundColor(Color::Green))?;
+        println!("Contest {} started.", contest_id);
+        execute!(stdout, ResetColor)?;
 
         let body = self.get_url(&format!("https://codeforces.com/contest/{}", contest_id))?;
         let mut problems: Vec<String> = vec![];

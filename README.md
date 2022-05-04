@@ -15,7 +15,7 @@ WIP. Pull Requests / Contributions are welcomed!
 - [x] submit
 - [x] config file
 - [x] session file
-- [ ] Colorful output
+- [x] Colorful output
 
 ## Interested 
 

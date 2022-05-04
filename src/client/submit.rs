@@ -1,6 +1,11 @@
 use std::fs::File;
 use std::io::Read;
 
+use crossterm::{
+    execute,
+    style::{Color, ResetColor, SetForegroundColor},
+};
+
 use crate::client::WebClient;
 use crate::CFToolError;
 
@@ -9,6 +14,8 @@ impl WebClient {
         Ok(format!("{}{}", problem_id, self.config.code_suffix))
     }
     pub fn submit(&mut self, contest_id: u32, problem_id: &str) -> Result<(), CFToolError> {
+        let mut stdout = std::io::stdout();
+
         println!("Submitting {} {}", contest_id, problem_id);
 
         let mut file = File::open(self.gen_code_filename(problem_id)?).unwrap();
@@ -36,11 +43,17 @@ impl WebClient {
         let error_caps = error_regex.captures(&body);
 
         if error_caps.is_some() {
+            execute!(stdout, SetForegroundColor(Color::Red))?;
             println!("Submit Failed: {}", error_caps.unwrap()[1].to_string());
+            execute!(stdout, ResetColor)?;
+
             return Err(CFToolError::FailedRequest);
         }
 
+        execute!(stdout, SetForegroundColor(Color::Green))?;
         println!("Submitted");
+        execute!(stdout, ResetColor)?;
+
         Ok(())
     }
 }

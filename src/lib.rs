@@ -19,3 +19,9 @@ impl fmt::Display for CFToolError {
         write!(f, "CFToolError")
     }
 }
+
+impl From<crossterm::ErrorKind> for CFToolError {
+    fn from(_: crossterm::ErrorKind) -> CFToolError {
+        CFToolError::FailedTerminalOutput
+    }
+}
